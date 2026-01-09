@@ -22,10 +22,12 @@
 
 body {
   margin: 0;
-  height: 100vh;
   background: transparent;
+}
+
+  .embed-safe {
+  padding: 24px;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
@@ -35,9 +37,8 @@ body {
 }
 
 .clock {
-  display: flex;
-  gap: 7px;
-  justify-content: center;
+  max-width: 100%;
+  transform-origin: center;
 }
 
 /* ===== CARD ===== */
@@ -127,7 +128,7 @@ body {
 </head>
 
 <body>
-
+<div class="embed-safe">
 <div class="clock-container">
 
   <div class="clock">
@@ -135,7 +136,7 @@ body {
       <div class="number" id="hour">12</div>
       <div class="day" id="day">MON</div>
     </div>
-
+  </div>
     <div class="card">
       <div class="number" id="minute">00</div>
       <div class="ampm" id="ampm">AM</div>
@@ -199,4 +200,5 @@ setTimeout(() => {
 </script>
 
 </body>
+
 </html>
