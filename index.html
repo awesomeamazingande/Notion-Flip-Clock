@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clock Widget</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --card-bg: #1a1a1a;
+  --text: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Bodoni Moda", serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-container {
+  text-align: center;
+  color: var(--text);
+}
+
+.clock {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+}
+
+/* ===== CARD ===== */
+
+.card {
+  position: relative;
+  width: 250px;
+  height: 360px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgb(255, 255, 255);
+}
+
+/* Main number */
+.number {
+  font-size: 180px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Labels */
+.day {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.ampm {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+/* ===== CONTROLS ===== */
+
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.clock-container:hover .controls {
+  opacity: 1;
+}
+
+#colorPicker {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+#hexInput {
+  width: 90px;
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid white;
+  background: transparent;
+  color: rgb(0, 0, 0);
+  outline: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="clock-container">
+
+  <div class="clock">
+    <div class="card">
+      <div class="number" id="hour">12</div>
+      <div class="day" id="day">MON</div>
+    </div>
+
+    <div class="card">
+      <div class="number" id="minute">00</div>
+      <div class="ampm" id="ampm">AM</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="color" id="colorPicker">
+    <input type="text" id="hexInput" placeholder="#HEX" maxlength="7">
+  </div>
+
+</div>
+
+<script>
+const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+const root = document.documentElement;
+const picker = document.getElementById("colorPicker");
+const hexInput = document.getElementById("hexInput");
+
+function isValidHex(hex) {
+  return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+}
+
+function applyColor(color) {
+  root.style.setProperty("--card-bg", color);
+  picker.value = color;
+  hexInput.value = color;
+  localStorage.setItem("clockColor", color);
+}
+
+const saved = localStorage.getItem("clockColor");
+if (saved && isValidHex(saved)) applyColor(saved);
+
+picker.addEventListener("input", e => applyColor(e.target.value));
+
+hexInput.addEventListener("input", e => {
+  let v = e.target.value.trim();
+  if (!v.startsWith("#")) v = "#" + v;
+  if (isValidHex(v)) applyColor(v);
+});
+
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes();
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+
+  document.getElementById("hour").textContent = String(h).padStart(2, "0");
+  document.getElementById("minute").textContent = String(m).padStart(2, "0");
+  document.getElementById("ampm").textContent = ampm;
+  document.getElementById("day").textContent = days[now.getDay()];
+}
+
+updateClock();
+setTimeout(() => {
+  updateClock();
+  setInterval(updateClock, 60000);
+}, (60 - new Date().getSeconds()) * 1000);
+</script>
+
+</body>
+</html>
