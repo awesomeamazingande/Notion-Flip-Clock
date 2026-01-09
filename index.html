@@ -37,8 +37,11 @@ body {
 }
 
 .clock {
-  max-width: 100%;
-  transform-origin: center;
+  display: flex;
+  flex-direction: row;   /* ← THIS is the key line */
+  gap: 7px;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ===== CARD ===== */
@@ -202,3 +205,4 @@ setTimeout(() => {
 </body>
 
 </html>
+
