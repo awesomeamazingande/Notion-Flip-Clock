@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Clock Widget</title>
+<meta charset="UTF-8">
+<title>Flip Clock</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@600&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --card-bg: #1a1a1a;
+  --bg: #1a1a1a;
   --text: #ffffff;
 }
 
@@ -22,164 +20,134 @@
 
 body {
   margin: 0;
+  height: 100vh;
   background: transparent;
-}
-
-  .embed-safe {
-  padding: 24px;
   display: flex;
   justify-content: center;
-}
-
-.clock-container {
-  text-align: center;
-  color: var(--text);
+  align-items: center;
 }
 
 .clock {
   display: flex;
-  flex-direction: row;   /* ← THIS is the key line */
-  gap: 7px;
-  justify-content: center;
-  align-items: center;
+  gap: 24px;
 }
 
-/* ===== CARD ===== */
-
-.card {
+.flip-card {
   position: relative;
-  width: 250px;
+  width: 260px;
   height: 360px;
-  background: var(--card-bg);
+  perspective: 1200px;
+  background: var(--bg);
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
 }
 
-.card::after {
+.flip-card::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 0;
   right: 0;
-  height: 2px;
-  background: rgb(255, 255, 255);
+  height: 1px;
+  background: white;
+  z-index: 5;
 }
 
-/* Main number */
-.number {
-  font-size: 180px;
+/* number stack */
+.stack {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease-in;
+}
+
+.num {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 210px;
   font-weight: 600;
   color: var(--text);
+  backface-visibility: hidden;
 }
 
-/* Labels */
-.day {
-  position: absolute;
-  bottom: 10px;
-  left: 14px;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.15em;
+.num.top {
+  top: 0;
+  background: #181818;
+  transform-origin: bottom;
 }
 
+.num.bottom {
+  bottom: 0;
+  background: #2a2a2a;
+  transform-origin: top;
+  transform: rotateX(180deg);
+}
+
+/* labels */
 .ampm {
   position: absolute;
-  bottom: 10px;
-  right: 14px;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.15em;
+  bottom: 8px;
+  right: 10px;
+  font-size: 22px;
+  letter-spacing: 0.2em;
 }
 
-/* ===== CONTROLS ===== */
-
-.controls {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 12px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.clock-container:hover .controls {
-  opacity: 1;
-}
-
-#colorPicker {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-#hexInput {
-  width: 90px;
-  padding: 6px 8px;
-  font-size: 12px;
-  text-align: center;
-  border-radius: 8px;
-  border: 1px solid white;
-  background: transparent;
-  color: rgb(0, 0, 0);
-  outline: none;
+.day {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 22px;
+  letter-spacing: 0.18em;
 }
 </style>
 </head>
 
 <body>
-<div class="embed-safe">
-<div class="clock-container">
 
-  <div class="clock">
-    <div class="card">
-      <div class="number" id="hour">12</div>
-      <div class="day" id="day">MON</div>
+<div class="clock">
+  <div class="flip-card" id="hours">
+    <div class="stack">
+      <div class="num top">12</div>
+      <div class="num bottom">12</div>
     </div>
+    <div class="day" id="day">MON</div>
   </div>
-    <div class="card">
-      <div class="number" id="minute">00</div>
-      <div class="ampm" id="ampm">AM</div>
+
+  <div class="flip-card" id="minutes">
+    <div class="stack">
+      <div class="num top">00</div>
+      <div class="num bottom">00</div>
     </div>
+    <div class="ampm" id="ampm">AM</div>
   </div>
-
-  <div class="controls">
-    <input type="color" id="colorPicker">
-    <input type="text" id="hexInput" placeholder="#HEX" maxlength="7">
-  </div>
-
 </div>
 
 <script>
 const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-const root = document.documentElement;
-const picker = document.getElementById("colorPicker");
-const hexInput = document.getElementById("hexInput");
 
-function isValidHex(hex) {
-  return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+function updateCard(card, value) {
+  const stack = card.querySelector(".stack");
+  const top = stack.querySelector(".top");
+  const bottom = stack.querySelector(".bottom");
+
+  if (top.textContent === value) return;
+
+  bottom.textContent = value;
+  stack.style.transform = "rotateX(-180deg)";
+
+  setTimeout(() => {
+    top.textContent = value;
+    stack.style.transition = "none";
+    stack.style.transform = "rotateX(0)";
+    stack.offsetHeight;
+    stack.style.transition = "transform 0.6s ease-in";
+  }, 600);
 }
-
-function applyColor(color) {
-  root.style.setProperty("--card-bg", color);
-  picker.value = color;
-  hexInput.value = color;
-  localStorage.setItem("clockColor", color);
-}
-
-const saved = localStorage.getItem("clockColor");
-if (saved && isValidHex(saved)) applyColor(saved);
-
-picker.addEventListener("input", e => applyColor(e.target.value));
-
-hexInput.addEventListener("input", e => {
-  let v = e.target.value.trim();
-  if (!v.startsWith("#")) v = "#" + v;
-  if (isValidHex(v)) applyColor(v);
-});
 
 function updateClock() {
   const now = new Date();
@@ -189,8 +157,9 @@ function updateClock() {
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12 || 12;
 
-  document.getElementById("hour").textContent = String(h).padStart(2, "0");
-  document.getElementById("minute").textContent = String(m).padStart(2, "0");
+  updateCard(document.getElementById("hours"), String(h).padStart(2, "0"));
+  updateCard(document.getElementById("minutes"), String(m).padStart(2, "0"));
+
   document.getElementById("ampm").textContent = ampm;
   document.getElementById("day").textContent = days[now.getDay()];
 }
@@ -203,6 +172,4 @@ setTimeout(() => {
 </script>
 
 </body>
-
 </html>
-
