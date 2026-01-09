@@ -38,9 +38,9 @@ body {
 /* ===== SCALER ===== */
 
 .clock-scale {
-  width: 520px;   /* base width */
-  height: 360px;  /* base height */
+  width: 520px;          /* base design width only */
   transform-origin: center center;
+  will-change: transform;
 }
 
 /* ===== CLOCK ===== */
@@ -238,13 +238,7 @@ function scaleClock() {
   const safe = document.querySelector(".embed-safe");
 
   const baseWidth = 520;
-  const baseHeight = 360;
-
-  const scale = Math.min(
-    safe.clientWidth / baseWidth,
-    safe.clientHeight / baseHeight,
-    1
-  );
+  const scale = Math.min(safe.clientWidth / baseWidth, 1);
 
   scaleEl.style.transform = `scale(${scale})`;
 }
@@ -255,3 +249,4 @@ scaleClock();
 
 </body>
 </html>
+
