@@ -229,13 +229,18 @@ hexInput.addEventListener("input", e => {
 /* ===== RESPONSIVE SCALING ===== */
 
 const BASE_WIDTH = 520;
+const BASE_HEIGHT = 400;
 
 function scaleClock() {
   const wrapper = document.getElementById("scaleWrapper");
   const parent = wrapper.parentElement;
 
-  const scale = parent.clientWidth / BASE_WIDTH;
-  wrapper.style.transform = `scale(${Math.min(scale, 1)})`;
+  const scaleX = parent.clientWidth / BASE_WIDTH;
+  const scaleY = parent.clientHeight / BASE_HEIGHT;
+
+  const scale = Math.min(scaleX, scaleY, 1);
+
+  wrapper.style.transform = `scale(${scale})`;
 }
 
 window.addEventListener("resize", scaleClock);
@@ -245,3 +250,4 @@ document.fonts.ready.then(scaleClock);
 
 </body>
 </html>
+
