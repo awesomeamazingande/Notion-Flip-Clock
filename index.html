@@ -28,21 +28,23 @@ html, body {
   overflow: hidden;
 }
 
-/* ===== EMBED SAFE WRAPPER ===== */
+/* ===== EMBED SAFE ===== */
 
 .embed-safe {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  overflow: hidden;
+  justify-content: center;
 }
 
-/* This element gets scaled */
-.clock-scale {
+/* ===== SCALE CONTAINER ===== */
+
+.scale-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transform-origin: center;
-  will-change: transform;
 }
 
 /* ===== CLOCK ===== */
@@ -54,7 +56,7 @@ html, body {
 
 .clock {
   display: flex;
-  gap: 7px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
 }
@@ -72,7 +74,6 @@ html, body {
   justify-content: center;
 }
 
-/* Divider */
 .card::after {
   content: "";
   position: absolute;
@@ -83,12 +84,12 @@ html, body {
   background: white;
 }
 
-/* Main number */
+/* Number */
 .number {
   font-size: 180px;
   font-weight: 600;
-  color: var(--text);
   line-height: 1;
+  color: var(--text);
 }
 
 /* Labels */
@@ -137,7 +138,6 @@ html, body {
   width: 90px;
   padding: 6px 8px;
   font-size: 12px;
-  text-align: center;
   border-radius: 8px;
   border: 1px solid white;
   background: transparent;
@@ -150,7 +150,7 @@ html, body {
 <body>
 
 <div class="embed-safe">
-  <div class="clock-scale">
+  <div class="scale-wrapper" id="scaleWrapper">
     <div class="clock-container">
 
       <div class="clock">
@@ -226,17 +226,16 @@ hexInput.addEventListener("input", e => {
   if (isValidHex(v)) applyColor(v);
 });
 
-/* ===== RESPONSIVE SCALING (NO CLIPPING) ===== */
+/* ===== RESPONSIVE SCALING ===== */
 
-const BASE_WIDTH = 520; // total clock width at design size
+const BASE_WIDTH = 520;
 
 function scaleClock() {
-  const wrapper = document.querySelector(".embed-safe");
-  const clock = document.querySelector(".clock-scale");
-  if (!wrapper || !clock) return;
+  const wrapper = document.getElementById("scaleWrapper");
+  const parent = wrapper.parentElement;
 
-  const scale = wrapper.clientWidth / BASE_WIDTH;
-  clock.style.transform = `scale(${Math.min(scale, 1)})`;
+  const scale = parent.clientWidth / BASE_WIDTH;
+  wrapper.style.transform = `scale(${Math.min(scale, 1)})`;
 }
 
 window.addEventListener("resize", scaleClock);
