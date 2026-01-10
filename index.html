@@ -25,12 +25,20 @@ body {
   background: transparent;
 }
 
-  html, body {
+html, body {
   width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden !important;
+  overflow: hidden;
+}
+
+  .scale-wrap {
+  transform-origin: center;
+  scale: min(
+    calc(100vw / 520),
+    calc(100vh / 420),
+    1
+  );
 }
 
 /* ===== EMBED SAFE WRAPPER ===== */
@@ -41,7 +49,6 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 100vh;
   overflow: hidden;
 }
 /* ===== SCALER ===== */
@@ -159,6 +166,7 @@ body {
 <body>
 
 <div class="embed-safe">
+    <div class="scale-wrap">
   <div class="clock-container">
 
     <div class="clock-scale">
@@ -176,6 +184,7 @@ body {
 
       </div>
     </div>
+  </div>
 
     <div class="controls">
       <input type="color" id="colorPicker">
@@ -260,6 +269,7 @@ scaleClock();
 
 </body>
 </html>
+
 
 
 
